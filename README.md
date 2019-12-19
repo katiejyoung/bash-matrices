@@ -52,26 +52,47 @@ $ cat m2
 7	8
 
 $ ./matrix dims m1
+
 2 4
+
 $ cat m2 | ./matrix dims
+
 4 2
+
 $ ./matrix add m1 m1
+
 2	4	6	8
+
 10	12	14	16
+
 $ ./matrix add m2 m2
+
 2	4
+
 6	8
+
 10	12
+
 14	16
+
 $ ./matrix mean m1
+
 3	4	5	6
+
 $ ./matrix transpose m1
+
 1	5
+
 2	6
+
 3	7
+
 4	8
+
 $ ./matrix multiply m1 m2
+
 50	60
+
 114	140
 
 You must check for the right number and format of arguments to matrix. This means that, for example, you must check that a given input file is readable, before attempting to read it. You are not required to test if the input file itself is valid. In other words, the behavior of matrix is undefined when the matrix input is not a valid matrix. for the purposes of this assignment, a valid matrix is a tab-delimited table containing at least one element, where each element is a signed integer, every entry is defined, and the table is rectangular.
@@ -84,18 +105,31 @@ The following are examples of invalid matrices. Our grading script (see below) d
 * A matrix with any element that is blank or not an integer.
 
 Here is a valid matrix file, m1:
+
 $ cat m1
+
 8	5	6
+
 3	2	2
+
 1	6	7
+
 5	0	7
+
 2	2	4
+
 $ cat -A m1   # The '-A' flag shows tabs as '^I' and newlines as '$'. This is a good way to check correctness.
+
 8^I5^I6$
+
 3^I2^I2$
+
 1^I6^I7$
+
 5^I0^I7$
+
 2^I2^I4$
+
 $ 
 
 If the inputs are valid -- your program should output only to stdout, and nothing to stderr. The return value should be 0.
