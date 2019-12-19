@@ -1,9 +1,4 @@
 #!/bin/bash
-#
-# Program 1
-# CS 344
-# Katelyn Young
-# Note: multiplication results are slow to appear
 
 NUMCOLS=0
 NUMROWS=0
