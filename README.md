@@ -33,14 +33,24 @@ add should take two MxN matrices and add them together element-wise to produce a
 multiply should take an MxN and NxP matrix and produce an MxP matrix. Note that, unlike addition, matrix multiplication is not commutative. That is A*B != B*A.
 Here is a brief example of what the output should look like.
 
+
+
 $ cat m1
+
 1	2	3	4
+
 5	6	7	8
+
 $ cat m2
+
 1	2
+
 3	4
+
 5	6
+
 7	8
+
 $ ./matrix dims m1
 2 4
 $ cat m2 | ./matrix dims
