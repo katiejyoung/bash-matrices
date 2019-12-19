@@ -169,7 +169,7 @@ Your script must support the following operations:
 `
 An invalid command must result in an error message to stderr, nothing to stdout, and a return value != 0.
 
-Hints
+## Hints
 Try writing each part as a separate function (see the 1.4 bash Functions reading). You can use $1 "${@:2}" to call the function named by argument 1, with the remaining arguments passed to it. For example, matrix multiply m1 m2 will expand $1 "${@:2}" to multiply m1 m2 inside your script, which will call the function named "multiply". This fancy bash method of calling functions would go at the bottom of your script, after the functions are defined.
 You'll need to use the read command extensively to read in data from a file. Note that it reads in one line at a time from the stdin buffer and stores the line in a variable called REPLY, unless specified. Generally, read is used in a while loop, where a file is redirected to stdin of the while loop. Calling read < myfile multiple times will repeatedly read the first line of myfile.
 The expr command and the shell can have conflicts over special characters.  If you try expr 5 * ( 4 + 2 ), the shell will think * is a filename wild card and the parentheses mean command grouping. You have to use backslashes, like this:
