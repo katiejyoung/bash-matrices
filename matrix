@@ -1,0 +1,433 @@
+#!/bin/bash
+#
+# Program 1
+# CS 344
+# Katelyn Young
+# Note: multiplication results are slow to appear
+
+NUMCOLS=0
+NUMROWS=0
+
+isValid() {
+# NAME: isValid
+# SYNOPSIS: Indicate file readability
+# DESCRIPTION: Returns value indicating whether passed argument is readable or not readable
+# AUTHOR: Katie Young
+
+    if [ -r $1 ]
+    then
+        return 1
+    fi
+    return 0
+}
+
+findRowCol() {
+# NAME: findRowCol
+# SYNOPSIS: Set global variables to appropriate values
+# DESCRIPTION: Sets global variables to reflect row and column numbers for a given matrix
+# AUTHOR: Katie Young
+    #Set local variable
+    local rowString=""
+    local intVal=""
+
+    # Reset global variables
+    NUMROWS=0
+    NUMCOLS=0
+
+    while IFS= read -r line
+    do
+        # Save line value to variable
+        rowString="$line"
+        NUMCOLS=0
+        # Loop through rowString characters
+        for (( i=0; i<${#rowString}; i++))
+        do
+            # Filter tab characters
+            if [[ ${rowString:i:1} != $'\t' ]] || [[ $i == ${#line} ]]
+            then
+                intVal+=${rowString:i:1}
+            else
+                # Increment numCols when new tab is reached
+                let NUMCOLS++
+            fi
+        done
+        # Increment row count and increase by one column
+        let NUMROWS++
+        let NUMCOLS++
+    done < <(grep . "$1")
+
+    return 0
+}
+
+dims() {
+# NAME: dims
+# SYNOPSIS: output dimensions
+# DESCRIPTION: Outputs dimension values for single matrix
+# AUTHOR: Katie Young
+    # Check for number of arguments exceeding 1
+    [ $# -gt 1 ] && echo "invalid number of arguments" >&2 && return 1
+    
+    # Check readability of first variable
+    isValid $1
+    [ $? != 1 ] && echo "input file not readable" >&2 && return 1
+
+    # Save user stdin/file input to variable
+    file=${1:--}
+
+    # Set global row/column count to current matrix values
+    findRowCol $file
+
+    # Set local variables to appropriate values
+    local numCols=$NUMCOLS
+    local numRows=$NUMROWS
+
+    # Output row/column values & return 0
+    echo -e $numRows $numCols
+    return 0
+}
+
+transpose() {
+# NAME: transpose
+# SYNOPSIS: output transpose of input
+# DESCRIPTION: Outputs transpose of single matrix
+# AUTHOR: Katie Young
+    # Check for number of arguments exceeding 1
+    [ $# -gt 1 ] && echo "invalid number of arguments" >&2 && return 1
+    
+    # Check readability of first variable
+    isValid $1
+    [ $? != 1 ] && echo "input file not readable" >&2 && return 1
+
+    # Save user stdin/file input to variable
+    file=${1:--}
+
+    # Set global row/column count to current matrix values
+    findRowCol $file
+
+    # Set local variables to appropriate values
+    local numCols=$NUMCOLS
+    local numRows=$NUMROWS
+    local iter1=0
+    local iter2=0
+    local lineCount=0
+
+    # Loop for each column
+    while [ $iter1 -lt $numCols ]
+    do
+        lineCount=0
+        # Loop through each line for each row
+        while IFS= read -r line
+        do
+            iter2=0
+            for i in $line
+            do
+                if [ $iter2 -eq $iter1 ]
+                then
+                    # Output values
+                    if [ $lineCount -eq $((numRows-1)) ]
+                    then
+                        echo -e -n "$i"
+                    else
+                        echo -e -n "$i\t"
+                    fi
+                fi
+                let iter2++
+            done
+            let lineCount++
+        done <"$1"
+
+        # Increment row tracker and add newline
+        let iter1++
+        echo ""
+    done
+    return 0 
+}
+
+mean() {
+# NAME: mean
+# SYNOPSIS: find mean of matrix
+# DESCRIPTION: Outputs mean value of matrix
+# AUTHOR: Katie Young
+    # Check for number of arguments exceeding 1
+    [ $# -gt 1 ] && echo "invalid number of arguments" >&2 && return 1
+    
+    # Check readability of first variable
+    isValid $1
+    [ $? != 1 ] && echo "input file not readable" >&2 && return 1
+
+    # Save user stdin/file input to variable
+    file=${1:--}
+
+    # Set global row/column count to current matrix values
+    findRowCol $file
+
+    # Set local variables to appropriate values
+    local numCols=$NUMCOLS
+    local numRows=$NUMROWS
+    local iter1=0
+    local iter2=0
+    local sum=0
+    local mean=0
+
+    # Loop for each column
+    while [ $iter1 -lt $numCols ]
+    do
+        #echo "iter1: $iter1"
+        sum=0
+        lineCount=0
+        # Loop through each line for each row
+        while IFS= read -r line
+        do
+            iter2=0
+            for i in $line
+            do
+                if [ $iter2 -eq $iter1 ]
+                then
+                    # Add values to sum
+                    sum=$(( $i + $sum ))
+                fi
+                let iter2++
+            done
+            let lineCount++
+        done <"$1"
+
+        # Increment row tracker and add newline
+        let iter1++
+        #echo "sum: $sum"
+        # Output mean for each column
+        mean=$(( ($sum + ($numRows / 2) * (($sum>0) * 2 - 1)) / $numRows ))
+
+        # Output values
+        if [ $iter1 -eq $numCols ]
+        then
+            echo -e -n "$mean"
+        else
+            echo -e -n "$mean\t"
+        fi
+    done
+    echo ""
+    return 0
+}
+
+add() {
+# NAME: add
+# SYNOPSIS: add matrices
+# DESCRIPTION: Outputs matrix with added values from two matrices
+# AUTHOR: Katie Young
+    #clear
+    # Check that number of arguments equals 2
+    [ $# -ne 2 ] && echo "invalid number of arguments" >&2 && return 1
+    
+    # Check readability of both files
+    isValid $1
+    [ $? != 1 ] && echo "input file 1 not readable" >&2 && return 1
+    isValid $2
+    [ $? != 1 ] && echo "input file 2 not readable" >&2 && return 1
+
+    local numRows1=0
+    local numRows2=0
+    local numCols1=0
+    local numCols2=0
+    local iter=0
+    local i=0
+    local j=0
+    local sum=0
+
+    # Set global row/column count to current matrix values
+    findRowCol $1
+    numRows1=$NUMROWS
+    numCols1=$NUMCOLS
+    findRowCol $2
+    numRows2=$NUMROWS
+    numCols2=$NUMCOLS
+
+    # Check that dimensions are equivalent
+    [ $numRows1 -ne $numRows2 ] && echo "invalid matrix selection" >&2 && return 1
+    [ $numCols1 -ne $numCols2 ] && echo "invalid matrix selection" >&2 && return 1
+
+    # Loop through each line for each row
+    while IFS=: read -r fileInput1 <&3 && read -r fileInput2 <&4 || [ -n "$a" ];
+    do
+        iter1=0
+        for i in $fileInput1
+        do
+            #echo "iter1: $iter1"
+            sum=0
+            iter2=0
+            for j in $fileInput2
+            do
+                if [ $iter1 -eq $iter2 ]
+                then
+                    sum=$(( $i + $j ))
+
+                    # Output values
+                    if [ $iter1 -eq $((numCols1-1)) ]
+                    then
+                        echo -e -n "$sum"
+                    else
+                        echo -e -n "$sum\t"
+                    fi
+                fi
+
+                # Increment second matrix counter
+                let iter2++
+            done
+
+            # Increment first matrix counter
+            let iter1++
+        done
+        echo ""  
+    done 3< <(grep . "$1") 4< <(grep . "$2")
+    
+
+    return 0
+}
+
+multiply() {
+# NAME: multiply
+# SYNOPSIS: multiply matrices
+# DESCRIPTION: Outputs matrix with multiplied values from two matrices
+# AUTHOR: Katie Young
+    # Check that number of arguments equals 2
+    [ $# -ne 2 ] && echo "invalid number of arguments" >&2 && return 1
+    
+    # Check readability of both files
+    isValid $1
+    [ $? != 1 ] && echo "input file 1 not readable" >&2 && return 1
+    isValid $2
+    [ $? != 1 ] && echo "input file 2 not readable" >&2 && return 1
+
+    # Set local variables
+    local numRows1=0
+    local numRows2=0
+    local numCols1=0
+    local numCols2=0
+    local sum=0
+    local product=0
+    local outputCount=0
+
+    # Reset global variables
+    NUMROWS=0
+    NUMCOLS=0
+
+    # Set global row/column count to current matrix values
+    findRowCol $1
+    numRows1=$NUMROWS
+    numCols1=$NUMCOLS
+
+    # Reset global variables
+    NUMROWS=0
+    NUMCOLS=0
+
+    findRowCol $2
+    numRows2=$NUMROWS
+    numCols2=$NUMCOLS
+
+    # Check that dimensions meet requirements for multiplication
+    [ $numCols1 -ne $numRows2 ] && echo "invalid matrix selection" >&2 && return 1
+
+    local rowIter=0
+    local colIter=0
+    local colPos=0
+    local currentRow=0
+    local readLine1=0
+    local readLine2=0
+
+    # Iterate through program numRows1 times 
+    while [ $currentRow -lt $numRows1 ]
+    do
+        # Reset counter
+        rowIter=0
+
+        # Iterate until numCols2 is reached
+        while [ $rowIter -lt $numCols2 ]
+        do
+            # Reset counters
+            sum=0
+            readLine1=0
+
+            # Loop through each matrix1 file
+            while IFS= read -r matrix1
+            do
+                if [ $readLine1 -eq $currentRow ]
+                then
+                    # Reset column counter
+                    colPos=0
+
+                    # Loop through lines of matrix1
+                    for i in $matrix1
+                    do
+                        # Reset counter
+                        readLine2=0
+                        
+                        # Loop through matrix2 file                      
+                        while IFS= read -r matrix2
+                        do
+                            # Reset counter
+                            colIter=0
+
+                            # Loop through lines of matrix2
+                            for j in $matrix2
+                            do
+                                # Check appropriate conditions for product/sum calculation
+                                if [ $colIter -eq $rowIter ] && [ $colPos -eq $readLine2 ]
+                                then
+                                    # Calculate product and add to sum
+                                    product=$(( $i * $j ))
+                                    sum=$(( $sum + $product ))
+
+                                    # Break from loop when done
+                                    break
+                                fi
+
+                                # Increment column counter
+                                let colIter++
+                            done
+
+                            # Increment line counter
+                            let readLine2++
+                            
+                        done <"$2"
+
+                        # Increment counter
+                        let colPos++
+
+                    done
+
+                    # Output sum total for each new matrix variable
+                    if [ $rowIter -lt $((numCols2-1)) ]
+                    then
+                        echo -e -n "$sum\t"
+                    else
+                        echo -e -n "$sum"  
+                    fi
+
+                    # Break from loop when complete
+                    break          
+                fi
+
+                # Increment line counter
+                let readLine1++
+                
+            done <"$1"
+
+            # Reset line counter
+            readLine=0
+
+            # Increment row counter
+            let rowIter++
+
+        done
+
+        echo ""
+
+        # Increment row of left matrix
+        let currentRow++
+    done
+
+    return 0
+}
+
+# Call appropriate function
+$1 "${@:2}"
+
