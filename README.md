@@ -170,13 +170,13 @@ Your script must support the following operations:
 An invalid command must result in an error message to stderr, nothing to stdout, and a return value != 0.
 
 ## Hints
-Try writing each part as a separate function (see the 1.4 bash Functions reading). You can use $1 "${@:2}" to call the function named by argument 1, with the remaining arguments passed to it. For example, matrix multiply m1 m2 will expand $1 "${@:2}" to multiply m1 m2 inside your script, which will call the function named "multiply". This fancy bash method of calling functions would go at the bottom of your script, after the functions are defined.
-You'll need to use the read command extensively to read in data from a file. Note that it reads in one line at a time from the stdin buffer and stores the line in a variable called REPLY, unless specified. Generally, read is used in a while loop, where a file is redirected to stdin of the while loop. Calling read < myfile multiple times will repeatedly read the first line of myfile.
-The expr command and the shell can have conflicts over special characters.  If you try expr 5 * ( 4 + 2 ), the shell will think * is a filename wild card and the parentheses mean command grouping. You have to use backslashes, like this:
+* Try writing each part as a separate function (see the 1.4 bash Functions reading). You can use $1 "${@:2}" to call the function named by argument 1, with the remaining arguments passed to it. For example, matrix multiply m1 m2 will expand $1 "${@:2}" to multiply m1 m2 inside your script, which will call the function named "multiply". This fancy bash method of calling functions would go at the bottom of your script, after the functions are defined.
+* You'll need to use the read command extensively to read in data from a file. Note that it reads in one line at a time from the stdin buffer and stores the line in a variable called REPLY, unless specified. Generally, read is used in a while loop, where a file is redirected to stdin of the while loop. Calling read < myfile multiple times will repeatedly read the first line of myfile.
+* The expr command and the shell can have conflicts over special characters.  If you try expr 5 * ( 4 + 2 ), the shell will think * is a filename wild card and the parentheses mean command grouping. You have to use backslashes, like this:
 expr 5 \* \( 4 + 2 \)
-I highly recommend that you develop this program directly on the class server (os1). Doing so will prevent you from having problems transferring the program back and forth, which can cause compatibility issues. Keep in mind that students caught developing on flip risk losing points on the assignment. If you are using Windows as your operating system, windows may replace newlines in files with newline-carriage returns. These will be displayed as ^M characters in vim. To remove them, use the utility dos2unix.
+* I highly recommend that you develop this program directly on the class server (os1). Doing so will prevent you from having problems transferring the program back and forth, which can cause compatibility issues. Keep in mind that students caught developing on flip risk losing points on the assignment. If you are using Windows as your operating system, windows may replace newlines in files with newline-carriage returns. These will be displayed as ^M characters in vim. To remove them, use the utility dos2unix.
 $ dos2unix bustedFile
-Consider the following snippet of code. This will allow you to use one variable to hold the path to a file with passed-in contents, no matter if they came via stdin or via a file specified on the command line:
+* Consider the following snippet of code. This will allow you to use one variable to hold the path to a file with passed-in contents, no matter if they came via stdin or via a file specified on the command line:
 datafilepath="datafile$$"
 if [ "$#" = "1" ]
 then
@@ -185,18 +185,19 @@ elif [ "$#" = "2" ]
 then
     datafilepath=$2
 fi
-Want to remove the last character from a string? Try this:
+* Want to remove the last character from a string? Try this:
 $ myvar="abcde"
 $ myvar=${myvar%?}
 $ echo $myvar
 abcd
-Want to display all the characters in a file or string, even the non-printing tabs and newlines? Try cat -A
-What to Turn in and When
+* Want to display all the characters in a file or string, even the non-printing tabs and newlines? Try cat -A
+
+## What to Turn in and When
 Simply submit your "matrix" script file. Your script must be entirely contained in this one file. Do not split this assignment into multiple files or programs. As our Syllabus says, please be aware that neither the Instructor nor the TA(s) are alerted to comments added to the text boxes in Canvas that are alongside your assignment submissions, and they may not be seen. No notifications (email or otherwise) are sent out when these comments are added, so we aren't aware that you have added content! If you need to make a meta-comment about this assignment, please include it in a #comment near the top of the script itself, or email the person directly who will be grading it (see the Home page for grading responsibilities).
 
 The due date given below is the last minute that this can be turned in for full credit. The "available until" date is NOT the due date, but instead closes off submissions for this assignment automatically once 48 hours past the due date has been reached, in accordance with our Syllabus Grading Policies.
 
-Grading
+## Grading
 148 points are available for your script (which is the only file you'll submit) successfully passing the grading script, while the final 12 points will be based on your style, readability, and commenting. Comment well, often, and verbosely: we want to see that you are telling us WHY you are doing things, in addition to telling us WHAT you are doing.
 
 The TAs will use this exact set of instructions: Program1 Grading.pdfPreview the document to grade your submission.
